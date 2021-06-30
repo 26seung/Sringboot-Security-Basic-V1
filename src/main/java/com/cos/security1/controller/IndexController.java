@@ -3,20 +3,32 @@ package com.cos.security1.controller;
 import com.cos.security1.config.auth.PrincipalDetails;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
+import com.cos.security1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //test
 @Controller
 public class IndexController {
 
+    @Autowired
+    private UserService userService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -58,7 +70,25 @@ public class IndexController {
     }
 
     @PostMapping("/join")
-    public String join(User user){
+    public String join(@Valid User user, Errors errors, Model model){
+
+//      if(bindingResult.hasErrors()){
+//          Map<String, String> errorMap = new HashMap<>();
+//
+//          for (FieldError error : bindingResult.getFieldErrors()){
+//              errorMap.put(error.getField(),error.getDefaultMessage());
+//          }
+        if (errors.hasErrors()) {
+            // 회원가입 실패시, 입력 데이터를 유지
+            model.addAttribute("user", user);
+
+            // 유효성 통과 못한 필드와 메시지를 핸들링
+            Map<String, String> validatorResult = userService.validateHandling(errors);
+            for (String key : validatorResult.keySet()) {
+                model.addAttribute(key, validatorResult.get(key));
+            }
+          return "/joinForm";
+      }
         user.setRole("ROLE_USER");
 
         String rawPassword = user.getPassword();
@@ -88,4 +118,9 @@ public class IndexController {
         return "데이터정보";
     }
 
+    // 접근에러
+    @GetMapping("/access-denied")
+    public String accessDenied(){
+        return "AccessDenied";
+    }
 }

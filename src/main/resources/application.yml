@@ -14,10 +14,17 @@ spring:
     username: cos
     password: cos1234
 
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .mustache
+  thymeleaf:
+    prefix : classpath:/templates/
+    suffix : .html
+    cache : false
+    check-template-location : true
+
+
+#  mvc:
+#    view:
+#      prefix: /templates/
+#      suffix: .mustache
 
   jpa:
     hibernate:
@@ -36,3 +43,4 @@ spring:
             scope:
               - email
               - profile
+

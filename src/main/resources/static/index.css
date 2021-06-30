@@ -1,0 +1,10 @@
+.container {
+    display: table;
+    width: 300px;
+    height: 200px;
+}
+
+.links {
+    text-align: center;
+    margin: auto;
+}
